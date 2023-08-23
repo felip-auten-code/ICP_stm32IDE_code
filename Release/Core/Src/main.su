@@ -1,0 +1,8 @@
+../Core/Inc/sd_card_lib/sd_funcs.h:14:6:delete_file	0	static
+../Core/Inc/sd_card_lib/sd_funcs.h:19:6:write_PoseEstimation	152	static
+../Core/Inc/sd_card_lib/sd_funcs.h:155:7:check_sd	16	static
+../Core/Inc/sd_card_lib/sd_funcs.h:166:5:SD_test	8	static
+../Core/Src/main.c:80:6:HAL_UART_RxCpltCallback	32	static
+../Core/Src/main.c:209:6:SystemClock_Config	88	static,ignoring_inline_asm
+../Core/Src/main.c:130:5:main	12528	static,ignoring_inline_asm
+../Core/Src/main.c:507:6:Error_Handler	0	static,ignoring_inline_asm
