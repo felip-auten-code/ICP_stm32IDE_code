@@ -17,27 +17,59 @@ void delete_file(FATFS fs, char* path){
 }
 
 void write_PoseEstimation(FATFS fs, FIL fil, float* info, int id){
-	char buff[100]; // n1[5], n2[5], n3[5];
+	char buff[40]; // n1[5], n2[5], n3[5];
 	FRESULT stat = f_mount(&fs, "", 0);
+	HAL_Delay(300);
 	int integer_p[3], decimal_p[3];
 	if(stat == 0){
-		f_open(&fil, "DATA_OUT.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
-		f_lseek(&fil, fs.fsize);
+		FRESULT open_file = f_open(&fil, "data_out.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_READ );
+		FRESULT seek_filesystem = f_lseek(&fil, fs.fsize);
 //		gcvt(info[0], 5, n1);
 //		gcvt(info[1], 5, n2);
 //		gcvt(info[2], 5, n3);
 //		sprintf(buff, "[%s,\t %s, \t %s]\t %d\n", n1, n2, n3, id);
 		for (int i =0; i< 3; i++){
 			integer_p[i]  = (int) info[i];
-			decimal_p[i] = (int)((float)(info[i]-integer_p[i]) * 100);
+			decimal_p[i] = abs((int)((float)(info[i]-integer_p[i]) * 10000));
 		}
+		memset(buff, 0 , sizeof(buff));
 		sprintf(buff, "[%d.%d,\t %d.%d, \t %d.%d]\t %d\n", 	integer_p[0], decimal_p[0],
 															integer_p[1], decimal_p[1],
 															integer_p[2], decimal_p[2],
 															id);
-		f_puts(buff, &fil);
+		int status = f_puts(buff, &fil);
 		f_close(&fil);
 	}
+}
+
+
+void Transmit_UART_PoseEstimation(UART_HandleTypeDef *huart, float* info, int id){
+	char buff[40]; // n1[5], n2[5], n3[5];
+	HAL_Delay(300);
+	int integer_p[3], decimal_p[3];
+
+//		gcvt(info[0], 5, n1);
+//		gcvt(info[1], 5, n2);
+//		gcvt(info[2], 5, n3);
+//		sprintf(buff, "[%s,\t %s, \t %s]\t %d\n", n1, n2, n3, id);
+	for (int i =0; i < 3; i++){
+		integer_p[i]  = (int) info[i];
+		decimal_p[i] = abs((int)((float)(info[i]-integer_p[i]) * 10000));
+	}
+	memset(buff, 0 , sizeof(buff));
+	int len = sprintf(buff, "[%d.%d,\t %d.%d, \t %d.%d]\t id=%d\n", 	integer_p[0], decimal_p[0],
+																		integer_p[1], decimal_p[1],
+																		integer_p[2], decimal_p[2],
+																		id);
+
+	if(HAL_UART_Transmit_IT(huart,(uint8_t*) buff, len) == HAL_OK){
+		HAL_Delay(100);
+	}else{
+		if(HAL_UART_Transmit(huart,(uint8_t*) buff, len, 180)==HAL_OK){
+			HAL_Delay(100);
+		}
+	}
+
 }
 
 //void write_data(FATFS fs, FIL fil, APP_DATA* app){
@@ -173,7 +205,9 @@ char* check_sd(FATFS fs, FIL fil, char* path){
 }
 
 int SD_test(FATFS fs, FIL fil){
-	return f_mount(&fs, "", 0);
+	int out = f_mount(&fs, "", 0);
+	f_close(&fil);
+	return out;
 }
 
 

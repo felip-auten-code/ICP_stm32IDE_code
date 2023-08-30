@@ -177,9 +177,12 @@ int main(void)
   }
 
   FRESULT SD_stat = SD_test( fs, fil);
-  bool OPEN_SAVE=0;
+  bool OPEN_SAVE = 0;
+  FRESULT op, cl;
   if(SD_stat == 0){
 	  OPEN_SAVE = 1;
+	  op = f_open(&fil, "data_data.txt", FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+//	  cl = f_close(&fil);
   }
   while (1)
   {
@@ -196,15 +199,11 @@ int main(void)
 		  for(int i =0; i< 3;i++){
 			  cumulative_transform[i] += aux[i];
 		  }
-		  if(OPEN_SAVE)
-			  write_PoseEstimation(fs, fil, cumulative_transform, frames_passed);
+		  Transmit_UART_PoseEstimation(&huart1, aux, frames_passed);
+		  // AUX WAS SENT
+		  HAL_Delay(100);
 	  }
-	  if(frames_passed == 5){
-		  for(int i =0; i< 3;i++){
-			  final_transform[i] = cumulative_transform[i];
-		  }
-		  return 0;
-	  }
+
 
   }
   /* USER CODE END 3 */

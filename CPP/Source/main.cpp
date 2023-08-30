@@ -13,7 +13,7 @@
 #include <String>
 #include <math.h>
 
-#define MAX_IT 20
+#define MAX_IT 30
 #define SCAN_SIZE 360
 
 double PI = 3.1415;
